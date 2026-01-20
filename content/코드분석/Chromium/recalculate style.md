@@ -15,18 +15,30 @@ https://www.youtube.com/watch?v=nWcexTnvIKI
 참고
 https://developer.chrome.com/docs/performance/insights/forced-reflow
 
-## invalidation
-### class
+# invalidation sets
+## class
+### class_invalidation_sets
 
+실제 동작은 매우 복잡하고 기능이 많기 때문에, 이후 디버깅을 쉽게 할 수 있도록  간단한 class 예제만 살펴볼 예정입니다.
 <p class="gray">css tree 파싱후에 class_invalidation_sets 을 생성 </p>
+
+devtools 에서 생성된 invalidation은 못보는것으로 확인
+[invalidation 디자인노트](https://docs.google.com/document/d/1vEW86DaeVs4uQzNFI5R-_xS9TcS1Cs_EUsHRSgCHGu8/edit?pli=1&tab=t.0#heading=h.xa3ovcncd2vp)
+
+실제로 밑의 example code 로 생성된 class_invalidation_sets 로그를 찍어보면 이렇게 나옴
+
+| Key    | Value      |
+| ------ | ---------- |
+| parent | { .child } |
+| child  | { $ }      |
+
+### perfetto ui 에서 확인한 invalidation 에서 reacalcstyle 까지의 과정
 
 | Order | perfetto slice name                  | 의미              |
 | ----- | ------------------------------------ | --------------- |
 | 1     | StyleInvalidatorInvalidationTracking | invalidation 감지 |
 | 2     | StyleRecalcInvalidationTracking      | recalc 대상 확정    |
 | 3     | StyleResolver::ResolveStyle          | 실제 스타일 계산       |
-devtools 에서 생성된 invalidation은 못보는것으로 확인
-[invalidation 디자인노트](https://docs.google.com/document/d/1vEW86DaeVs4uQzNFI5R-_xS9TcS1Cs_EUsHRSgCHGu8/edit?pli=1&tab=t.0#heading=h.xa3ovcncd2vp)
 
 Changes in the DOM that require updates to styles
 참고 https://chromium.googlesource.com/chromium/src/+/master/third_party/blink/renderer/core/css/style-invalidation.md

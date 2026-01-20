@@ -1,5 +1,6 @@
 
-https://github.com/mui/base-ui/pull/3793
+recalculate 이란
+- [[recalculate style]]
 
 in style_engine.cc
 ```c++
@@ -36,6 +37,8 @@ chromium 134 초과
 ```
 font 가 다를떄만 recalc style
 
-cc. [[reacalculate style]]
 
+
+
+https://github.com/mui/base-ui/pull/3793
 

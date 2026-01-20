@@ -14,4 +14,4 @@ https://chromium.googlesource.com/chromium/src/+/main/docs/testing/testing_in_ch
 
 ### recalc style
 
-[[reacalculate style]]
+[[recalculate style]]

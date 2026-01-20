@@ -47,7 +47,7 @@ TraceEvents.ts
 ```
 
 실제로 (perfetto ui) 에서는 'UpdateLayoutTree' 로 보임
-> perfetto ui 에서 보이는 이벤트 [[reacalculate style#주의점]]
+> perfetto ui 에서 보이는 이벤트 [[recalculate style#주의점]]
 ### Forced reflow  경고
 
 processForcedReflowWarning 의 일부 코드 
