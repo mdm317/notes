@@ -45,6 +45,16 @@ export default ((opts?: Partial<FolderContentOptions>) => {
           }
 
           if (node.isFolder && options.showSubfolders) {
+            // Check if there's a child file with the same name as the folder
+            const matchingChild = node.children.find(
+              (child) => !child.isFolder && child.displayName === node.displayName
+            )
+
+            // If there's a matching file, use that file's data instead of creating synthetic data
+            if (matchingChild && matchingChild.data) {
+              return matchingChild.data
+            }
+
             // folders that dont have data need synthetic files
             const getMostRecentDates = (): QuartzPluginData["dates"] => {
               let maybeDates: QuartzPluginData["dates"] | undefined = undefined

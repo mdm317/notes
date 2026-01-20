@@ -58,14 +58,45 @@ export default ((opts?: Partial<BreadcrumbOptions>) => {
       return null
     }
 
-    const crumbs: CrumbData[] = pathNodes.map((node, idx) => {
-      const crumb = formatCrumb(node.displayName, fileData.slug!, simplifySlug(node.slug))
+    // Remove consecutive duplicate display names (e.g., folder "b" followed by file "b")
+    // When a folder is followed by a file with the same name, keep the file instead
+    const filteredNodes = pathNodes.reduce<typeof pathNodes>((acc, node, idx) => {
+      if (idx === 0) {
+        acc.push(node)
+        return acc
+      }
+
+      const nextNode = idx < pathNodes.length - 1 ? pathNodes[idx + 1] : null
+
+      // If this is a folder and the next node has the same display name, skip this folder
+      if (node.isFolder && nextNode && node.displayName === nextNode.displayName) {
+        return acc
+      }
+
+      acc.push(node)
+      return acc
+    }, [])
+
+    const crumbs: CrumbData[] = filteredNodes.map((node, idx) => {
+      let targetSlug = node.slug
+
+      // If this is a folder, check if there's a child file with the same name
+      if (node.isFolder) {
+        const matchingChild = node.children.find(
+          (child) => !child.isFolder && child.displayName === node.displayName
+        )
+        if (matchingChild) {
+          targetSlug = matchingChild.slug
+        }
+      }
+
+      const crumb = formatCrumb(node.displayName, fileData.slug!, simplifySlug(targetSlug))
       if (idx === 0) {
         crumb.displayName = options.rootName
       }
 
       // For last node (current page), set empty path
-      if (idx === pathNodes.length - 1) {
+      if (idx === filteredNodes.length - 1) {
         crumb.path = ""
       }
 

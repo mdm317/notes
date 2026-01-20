@@ -13,7 +13,9 @@
   },
   "scripts": {
     "quartz": "./quartz/bootstrap-cli.mjs",
+    "sync":"rsync -av --delete '/Users/jeong-yunjo/Documents/Obsidian Vault/기록/' ./content/",
     "docs": "npx quartz build --serve -d docs",
+    "dev": "npm run sync && npx quartz build --serve -d content",
     "check": "tsc --noEmit && npx prettier . --check",
     "format": "npx prettier . --write",
     "test": "tsx --test",

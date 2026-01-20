@@ -115,8 +115,17 @@ function createFolderNode(
     // Replace button with link for link behavior
     const button = titleContainer.querySelector(".folder-button") as HTMLElement
     const a = document.createElement("a")
-    a.href = resolveRelative(currentSlug, folderPath)
-    a.dataset.for = folderPath
+
+    // Check if there's a child file with the same name as the folder
+    const matchingChild = node.children.find(
+      child => !child.isFolder && child.displayName === node.displayName
+    )
+
+    // If there's a matching file, link to it; otherwise link to the folder
+    a.href = matchingChild
+      ? resolveRelative(currentSlug, matchingChild.slug)
+      : resolveRelative(currentSlug, folderPath)
+    a.dataset.for = matchingChild ? matchingChild.slug : folderPath
     a.className = "folder-title"
     a.textContent = node.displayName
     button.replaceWith(a)
