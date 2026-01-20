@@ -1,7 +1,8 @@
+### useState 가 마운트 될 때 
 
 inside ReactFiberHooks.js
 HooksDispatcherOnMount => useState => mountState => mountStateImpl => mountWorkInProgressHook
-```ts
+```ts 
 
 function mountWorkInProgressHook(): Hook {
   const hook: Hook = {
@@ -26,7 +27,26 @@ function mountWorkInProgressHook(): Hook {
 
 ```
 mountWorkInProgressHook 가 호출되면 
+훅 객체를 만들고 
 현재 fiber 의 memoizedState 에 훅은 연결리스트로 연결
+
+```ts
+function mountStateImpl<S>(initialState: (() => S) | S): Hook {
+  const hook = mountWorkInProgressHook();
+  hook.memoizedState = hook.baseState = initialState;
+  const queue: UpdateQueue<S, BasicStateAction<S>> = {
+    pending: null,
+    lanes: NoLanes,
+    dispatch: null,
+    lastRenderedReducer: basicStateReducer,
+    lastRenderedState: (initialState: any),
+  };
+  hook.queue = queue;
+  return hook;
+}
+
+```
+Hooks 객체의 데이터는 `mountStateImpl` 에서 넣음
 
 예를 들어 
 ```ts
@@ -39,7 +59,7 @@ const Comp = ()=>{
 }
 
 ```
-이런 컴포넌트가 있다면  Comp 의 fiber 의 memoizedState 데이터는 아래와 같다
+이런 컴포넌트가 있다면  Comp 의 fiber 의 memoizedState 데이터는 아래와 같음
 ```ts
 
  {
@@ -124,15 +144,9 @@ queue.pending = update; (12) 에 circular linked list 로 저장됨
 1 이 순서대로 업데이트 되었다면 queue.pending => 1(circular)
 1,2,3 이 순서대로 업데이트 되었다면 queue.pending => 3,1,2
 1,2,3, 4 이 순서대로 업데이트 되었다면 queue.pending => 4,1,2
-이런 circular 식으로 저장
-??
-일반 Linked List:  head → A → B → C → null
-                   ↑ 추적
 
-Circular (tail):   ┌─────────────────┐
-                   ↓                 │
-                   A → B → C ────────┘
-                           ↑ pending(tail)
+###  rendering
+
 renderWithHooks 에서 HooksDispatcherOnUpdate 로 갈아끼워짐
 ```ts
 
@@ -146,7 +160,7 @@ renderWithHooks 에서 HooksDispatcherOnUpdate 로 갈아끼워짐
 HooksDispatcherOnUpdate => useState => updateState => updateReducer => updateReducerImpl
 
 
-updateReducerImpl 여기서부터 시작
+### updateReducerImpl 
 ```ts
 
   let baseQueue = hook.baseQueue;
@@ -182,14 +196,22 @@ hook 객체의 queue 의 pending 안에있던 데이터를 baseQueue에 옮김
 
 
 ```ts
-
+// updateReducerImpl
 const first = baseQueue.next;
 
 ```
 next 로 한번 접근함으로써 first 에는 4 -> 1 -> 2 -> 3 에서 1 -> 2 -> 3 -> 4 로 변경
 
-```ts nums
+```ts
+let shouldSkipUpdate = isHiddenUpdate
+    ? !isSubsetOfLanes(getWorkInProgressRootRenderLanes(), updateLane)
+    : !isSubsetOfLanes(renderLanes, updateLane);
 
+```
+shouldSkipUpdate 로 현재 renderLanes 의 업데이트만 상태 업데이트
+
+```ts nums
+// updateReducerImpl
 do{
 	let shouldSkipUpdate = isHiddenUpdate
 		? !isSubsetOfLanes(getWorkInProgressRootRenderLanes(), updateLane)
@@ -207,26 +229,9 @@ do{
 } while (update !== null && update !== first);
 
 ```
-7줄에서 우선순위가 낮은 업데이트는 newBaseQueueLast 에 저장해서 보존
-eagerState 는 dispatchSetStateInternal 안에서 queue 가 비어있을때 설정된다.
-
-```ts
-
-    if (
-      fiber.lanes === NoLanes &&
-      (alternate === null || alternate.lanes === NoLanes)
-    ) {
-      // The queue is currently empty, which means we can eagerly compute the
-      // next state before entering the render phase. If the new state is the
-      // same as the current state, we may be able to bail out entirely.
-      ...
-        update.hasEagerState = true;
-        update.eagerState = eagerState;
-    }
-
-```
-순서대로 업데이트
-reducer 는 updateState => basicStateReducer 는 밑과 같음
+순서대로 업데이트 (9 ~ 13)
+reducer 는 updateState => basicStateReducer 는 밑과 같음 (12)
+eagerState 는 dispatchSetStateInternal 안에서 queue 가 비어있을때 설정된다. (9)
 ```ts
 
 function basicStateReducer<S>(state: S, action: BasicStateAction<S>): S {
@@ -235,3 +240,4 @@ function basicStateReducer<S>(state: S, action: BasicStateAction<S>): S {
 ```
 
 
+7줄에서 우선순위가 낮은 업데이트(transition)는 newBaseQueueLast 에 저장해서 보존후 복원
