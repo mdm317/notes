@@ -3,6 +3,13 @@
 [세팅법](
 https://chromium.googlesource.com/devtools/devtools-frontend/+/main/docs/get_the_code.md)
 
+크롬 버젼벌 테스트
+- 다운로드
+	- https://googlechromelabs.github.io/chrome-for-testing/#stable
+- 옜날버젼
+	- https://github.com/GoogleChromeLabs/chrome-for-testing/blob/main/data/latest-versions-per-milestone-with-downloads.json?utm_source=chatgpt.com
+- third_party/chrome/chrome-mac
+	- 경로에 다운받은걸 붙여넣으면 가능
 
 녹화했을때 이벤트를 수집하는 코드 
 front_end/services/tracing/PerformanceTracing.ts
@@ -47,7 +54,7 @@ TraceEvents.ts
 ```
 
 실제로 (perfetto ui) 에서는 'UpdateLayoutTree' 로 보임
-> perfetto ui 에서 보이는 이벤트 [[recalculate style#주의점]]
+> perfetto ui 에서 보이는 이벤트 [[recalculate style 기본동작과 디버깅#주의점]]
 ### Forced reflow  경고
 
 processForcedReflowWarning 의 일부 코드 

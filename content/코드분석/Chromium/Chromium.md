@@ -14,4 +14,4 @@ https://chromium.googlesource.com/chromium/src/+/main/docs/testing/testing_in_ch
 
 ### recalc style
 
-[[recalculate style]]
+[[recalculate style 기본동작과 디버깅]]

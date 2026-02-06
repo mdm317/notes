@@ -1,42 +1,16 @@
 
-recalculate 이란
-- [[recalculate style]]
+overlay scroll 인 경우에 html overflow style 을 변경시에 전체트리 reflow 가 발생하고 있었다.
 
-in style_engine.cc
-```c++
+[[전체트리 recalculate 발생 원인]]
 
-bool root_font_changed = 
-	rem_changed || root_font_glyphs_changed || root_line_height_changed;
+원인을 찾아보니 
+자식노드중 하나가 
+`max-height: calc(8.75lh + 0.5rem);`
+이 스타일을 가지고 있었고 
 
-```
-root_font_changed 가 변화되면 모든 트리 recalc style
+스크롤을 막히위해 html overflow 를 hidden 으로 변경할때 발생헀다.
 
-chromium 133 이하
-
-```c++
-
-  bool root_font_glyphs_changed =
-	  !old_root_style ||
-	  (UsesGlyphRelativeUnits() &&
-	  old_root_style->GetFont() != new_root_style->GetFont());
-
-```
-이버젼에서는 UsesGlyphRelativeUnits 단위를 사용하고 있고 html 의 style 이 변경되면 무조권 every tree recalc style
-
-chromium 134 초과
-```c++
-
-  bool root_font_glyphs_changed =
-      !old_root_style ||
-      (UsesGlyphRelativeUnits() &&
-       (base::FeatureList::IsEnabled(blink::features::kCSSFontComparisonFix)
-            ? !base::ValuesEquivalent<Font>(old_root_style->GetFont(),
-                                            new_root_style->GetFont())
-            : old_root_style->GetFont() != new_root_style->GetFont()));
-
-```
-font 가 다를떄만 recalc style
-
+html 의 css 만 변경하지 않으면 되어서 overflow를 body 쪽으로 옮겼다.
 
 
 
