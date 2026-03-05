@@ -6,3 +6,4 @@ type-predicates 동작 방식
 
 타입스크립트가 infer를 실행하는 방식
 - [[InferArgument]]
+

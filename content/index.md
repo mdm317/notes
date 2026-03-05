@@ -21,10 +21,10 @@
 
 ### cross-browsing
 [[이미지 태그에 동영상을 첨부했을때 safari]]
+[[Safari에서 새로고침 시 스크롤이 늦게 복원되는 이유]]
 
 ### next
 [[serveraction 는 Fetch 로는 사용하지 말자]]
-
 [[unstable_cache]]
 
 ### serverless

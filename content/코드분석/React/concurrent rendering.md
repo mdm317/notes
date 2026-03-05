@@ -1,4 +1,7 @@
 
+> [!important]
+> 리액트 19.2 기준
+
 v19 의 리액트의 랜더링에는 두가지 모드가 존재
  - sync rendering
  - concurrent rendering
