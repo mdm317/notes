@@ -1,0 +1,23 @@
+{
+  "name": "obsidian-blog",
+  "private": true,
+  "scripts": {
+    "sync:content": "sh scripts/sync-content.sh",
+    "dev": "next dev --webpack",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "latest",
+    "nextra": "latest",
+    "nextra-theme-blog": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "typescript": "latest"
+  }
+}
