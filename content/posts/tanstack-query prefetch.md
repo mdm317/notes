@@ -1,6 +1,5 @@
 
 ## 서버데이터 처리
-
 서버에서 가져온 데이터를 Client Component의 QueryCache와 연결하는 방법들
 
 ### initialData

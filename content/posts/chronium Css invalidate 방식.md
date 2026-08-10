@@ -1,5 +1,5 @@
-# Chromium은 스타일 재계산 대상을 어떻게 좁히는가
 
+# Chromium은 스타일 재계산 대상을 어떻게 좁히는가
 
 DOM 요소의 class나 id 같은 attribute가 바뀌면 기존에 매칭되던 CSS selector가 더 이상 매칭되지 않거나 새로운 selector가 매칭될 수 있다. 이때 DOM 트리의 모든 요소에 대해 스타일을 다시 계산하면 비용이 크다.
 

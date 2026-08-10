@@ -1,12 +1,3 @@
----
-title: 스크롤 잠금 한 줄이 전체 트리 Style Recalculation을 일으킨 이유
-date: 2026-07-31
-tags:
-  - web-performance
-  - chromium
-  - css
-  - base-ui
----
 
 ## 문제: `html`의 `overflow`를 바꿀때 긴 시간의 style recalculate 가 발생했다
 

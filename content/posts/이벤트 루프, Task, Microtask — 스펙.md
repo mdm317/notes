@@ -1,7 +1,4 @@
----
-tags: [javascript, event-loop, html-spec, browser, blog]
-created: 2026-06-29
----
+
 
 # 이벤트 루프, Task, 그리고 Microtask — 스펙
 
@@ -10,7 +7,7 @@ created: 2026-06-29
 
 ---
 
-## 1.  'task' 란
+## 'task' 란
 
 callback 실행, DOM 변경에 대한 반응, 파싱 등의 작업은 모두 **task라는 단위로 표현된다.**
 
@@ -24,7 +21,7 @@ callback 실행, DOM 변경에 대한 반응, 파싱 등의 작업은 모두 **t
 
 ---
 
-## 2. 이벤트 루프의 한 바퀴
+## 이벤트 루프의 한 바퀴
 
 이 task들을 실제로 실행시키는게 **이벤트 루프**다. 스펙(§8.1.7.3 Processing model)이 정의한 한 바퀴의 앞부분은 이렇게 생겼다.
 
@@ -43,7 +40,7 @@ callback 실행, DOM 변경에 대한 반응, 파싱 등의 작업은 모두 **t
 
 ---
 
-## 3. microtask와 task 의 차이
+## microtask와 task 의 차이
 
 
 > **A microtask is a colloquial way of referring to a task** that was created via the queue a microtask algorithm.
@@ -62,42 +59,9 @@ callback 실행, DOM 변경에 대한 반응, 파싱 등의 작업은 모두 **t
 만약  promise가  동기 + 비동기로 된다면 타이밍에 따라 순서가 바뀔수있음 <"Don't release Zalgo">
 
 
----
-# chronium 구현
+## long task는 'task + microtask'다
 
-## 4. DevTools의 'Task'
-
- Performance 탭의 최상위 **`Task`** 막대는 HTML 스펙의 task가 **아니다.** 이건 Chromium 스케줄러의 트레이스 이벤트 **`RunTask`** 다.
-
-```cpp
-// base/task/sequence_manager/thread_controller_with_message_pump_impl.cc
-TRACE_EVENT0(TRACE_DISABLED_BY_DEFAULT("devtools.timeline"), "RunTask");
-```
-
-### 클릭 한 번의 전체 흐름
-
-```
-[OS] 클릭
-  → [브라우저 프로세스] Mojo IPC 로 렌더러에 전송
-  → [렌더러 compositor 스레드] JS 처리 필요 → 메인 스레드로 PostTask
-       main_task_runner_->PostTask(..., MainThreadEventQueue::DispatchEvents)
-  → [메인 스레드] 메시지 펌프가 깨어나 그 task 실행
-       ┌ RunTask  ← ★ DevTools 의 "Task" 막대
-       │   DispatchEvents → EventHandler → EventDispatcher::Dispatch
-       │     DEVTOOLS_TIMELINE_TRACE_EVENT("EventDispatch")  ← "Event: click"
-       │       → JS click 리스너 실행
-       │   (핸들러 반환)
-       │   Run Microtasks  ← microtask checkpoint
-       └ RunTask 종료
-```
-
-그래서 Performance 탭에서 보이는 계층은 **`Task`(RunTask) → `Event: click` → (핸들러) → `Run Microtasks`** 다. DevTools가 중첩을 그리는 기준은 호출 관계가 아니라 **시간 포함 관계(timestamp containment)** 라서, microtask의 시간 구간이 Task 안에 들어가면 그 안에 중첩되어 그려진다.
-
----
-
-## 5. 그래서 long task는 'task + microtask'다
-
-마지막 조각. 스펙에서 시간을 찍는 위치를 보면:
+스펙에서 시간을 찍는 위치를 보면:
 
 - `taskStartTime` → **task 실행 전**(step 2.2)
 - `taskEndTime` → **microtask checkpoint 후**(step 3)
@@ -108,13 +72,13 @@ TRACE_EVENT0(TRACE_DISABLED_BY_DEFAULT("devtools.timeline"), "RunTask");
 
 그래서 클릭 핸들러 안에서 무거운 promise 체인이나 `queueMicrotask`를 돌리면, **그 microtask 시간까지 합쳐서** 50ms를 넘으면 long task로 잡힌다.
 
-### 흔한 오해 하나
+### 할수있는 오해
 
 "fetch 응답이 핸들러 도중 도착하면 그 `.then`이 클릭 task에 합산되는 거 아냐?" → **아니다.** fetch 같은 비동기 I/O 완료는 **그 자체가 별도의 task**(networking task)로 메인 스레드에 들어온다. 메인 스레드는 단일 스레드 + run-to-completion이라, **클릭 task가 실행되는 동안 끼어들 수 없다.** fetch의 `.then`은 응답을 처리하는 그 networking task의 microtask checkpoint에서 실행되므로, 클릭 task 시간에는 포함되지 않는다.
 
 합산되는 건 어디까지나 **핸들러 실행 *중에* 큐에 들어간 microtask**(이미 resolved된 promise, `queueMicrotask`, 동기적으로 시작된 promise 체인)뿐이다. 기준은 단 하나 — **"microtask가 언제 큐에 들어갔나"**.
 
----
+
 
 ## 정리
 
