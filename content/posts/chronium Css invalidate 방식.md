@@ -10,8 +10,20 @@ Blink는 스타일시트의 selector를 미리 분석해 invalidation 정보를 
 
 using InvalidationSetMap =
     HashMap<AtomicString, scoped_refptr<InvalidationSet>>;
+using InvalidationSetMap =
+    HashMap<AtomicString, scoped_refptr<InvalidationSet>>;
+
+using PseudoTypeInvalidationSetMap =
+    HashMap<CSSSelector::PseudoType,
+        scoped_refptr<InvalidationSet>,
+        IntWithZeroKeyHashTraits<unsigned>>;
+
+using ValuesInHasArgument = HashSet<AtomicString>;
+using PseudosInHasArgument =
+      HashSet<CSSSelector::PseudoType>;
 
 InvalidationSetMap class_invalidation_sets;
+
 ~~~
 
 `class_invalidation_sets`는 class 이름을 key로 사용하고, 해당 class가 변경됐을 때 필요한 `InvalidationSet`을 value로 저장하는 map이다.  
