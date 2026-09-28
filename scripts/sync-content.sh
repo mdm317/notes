@@ -19,4 +19,4 @@ rsync -a --delete --delete-excluded \
   --exclude='/.DS_Store' \
   "$OBSIDIAN_BLOG_DIR/" \
   content/posts/
-node scripts/preserve-line-breaks.mjs content/posts
+node scripts/preserve-line-breaks.mjs content/posts "$OBSIDIAN_BLOG_DIR"

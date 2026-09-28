@@ -11,7 +11,7 @@ export async function getPosts() {
     .filter(post => post.route !== '/posts')
     .toSorted(
       (a, b) =>
-        new Date(b.frontMatter.date).getTime() -
-        new Date(a.frontMatter.date).getTime()
+        new Date(b.frontMatter.created).getTime() -
+        new Date(a.frontMatter.created).getTime()
     )
 }

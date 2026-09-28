@@ -1,3 +1,7 @@
+---
+created: 2026-08-10T08:00:39.054Z
+---
+
 
 ## 문제: `html`의 `overflow`를 바꿀때 긴 시간의 style recalculate 가 발생했다  
 
